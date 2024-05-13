@@ -1,4 +1,11 @@
 /* Custom styles for the header */
+@import url('https://fonts.googleapis.com/css2?family=SF+Pro+Rounded:wght@400;700&display=swap');
+
+body {
+  font-family: 'SF Pro Rounded', sans-serif;
+}
+
+/* Custom styles for the header */
 .navbar-custom {
     background-color: #343a40;
     padding: 15px 0;
@@ -30,7 +37,7 @@
     background-color: #343a40;
     color: white;
     padding: 20px 0;
-    position: absolute;
+    position: relative;
     bottom: 0;
     width: 100%;
   }
