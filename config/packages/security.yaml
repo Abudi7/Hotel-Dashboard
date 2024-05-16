@@ -16,9 +16,13 @@ security:
         main:
             lazy: true
             provider: app_user_provider
-            custom_authenticator: App\Security\LoginFormAuthenticator
+            custom_authenticator:
+                - App\Security\LoginFormAuthenticator
+                - App\Security\AppCustomAuthenticator
             logout:
                 path: app_logout
+                # where to redirect after logout
+                # target: app_any_route
                 # where to redirect after logout
                 # target: app_any_route
 
@@ -26,6 +30,13 @@ security:
                 secret: '%kernel.secret%'
                 lifetime: 604800
                 path: /
+                always_remember_me: true
+            form_login:
+                login_path: app_login
+                check_path: app_login
+                enable_csrf: true
+            # Set the entry point to the form_login authenticator
+            entry_point: form_login
                 # by default, the feature is enabled by checking a checkbox in the
                 # login form, uncomment the following line to always enable it.
                 #always_remember_me: true
