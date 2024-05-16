@@ -43,21 +43,10 @@ class RegistrationController extends AbstractController
             // Set the default role for the user
             $user->setRoles(['ROLE_USER']);
 
-            // Handle image upload
-            $file = $form->get('img')->getData();
-            if ($file) {
-                $fileName = uniqid().'.'.$file->guessExtension();
-                try {
-                    $file->move(
-                        $this->getParameter('kernel.project_dir').'/public/img', // Path to public/img directory
-                        $fileName
-                    );
-                    $user->setImg($fileName);
-                } catch (FileException $e) {
-                    $this->addFlash('error', 'An error occurred while uploading the image.');
-                    return $this->redirectToRoute('app_register');
-                }
-            }
+            // Set the default image for the user
+            $user->setImg("defualt-profile.png");
+          
+            
 
             // Encode the plain password
             $user->setPassword(
@@ -88,6 +77,7 @@ class RegistrationController extends AbstractController
             'registrationForm' => $form->createView(),
         ]);
     }
+
 
     #[Route('/verify/email', name: 'app_verify_email')]
     public function verifyUserEmail(Request $request, TranslatorInterface $translator): Response

@@ -15,7 +15,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\IsTrue;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
-
+use Symfony\Component\Validator\Constraints\File;
 class RegistrationFormType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -62,9 +62,22 @@ class RegistrationFormType extends AbstractType
                     'Female' => 'female',
                 ],
             ])
-            ->add('img', FileType::class, [
-                'mapped' => false, 
-            ])
+            // ->add('img', FileType::class, [
+            //     'label' => 'Profile Image',
+            //     'mapped' => false,
+            //     'required' => false,
+            //     'constraints' => [
+            //         new File([
+            //             'maxSize' => '1024k',
+            //             'mimeTypes' => [
+            //                 'image/jpeg',
+            //                 'image/png',
+            //                 'image/gif',
+            //             ],
+            //             'mimeTypesMessage' => 'Please upload a valid image file (JPEG, PNG, GIF)',
+            //         ])
+            //     ],
+            // ])
             // ->add('roles', ChoiceType::class, [
             //     'multiple' => true,
             //     'expanded' => true,
