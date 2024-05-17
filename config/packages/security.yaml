@@ -52,7 +52,12 @@ security:
     access_control:
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
+        # Allow access to all routes for users with the role ROLE_ADMIN
+         # - { path: ^/, roles: ROLE_ADMIN }
 
+         # Deny access to edit and delete actions for users with the role ROLE_ADMIN
+          #- { path: ^/rooms/\d+/edit, roles: ROLE_ADMIN }
+          #- { path: ^/rooms/\d+/delete, roles: ROLE_ADMIN }
 when@test:
     security:
         password_hashers:
