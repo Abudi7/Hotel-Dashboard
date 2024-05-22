@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Rooms index{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1 class="mt-4 mb-4 text-center">Rooms Index</h1>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Price</th>
+                    <th>Created at</th>
+                    <th>Type</th>
+                    <th>Image</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for room in rooms %}
+                <tr>
+                    <td>{{ room.id }}</td>
+                    <td>{{ room.name }}</td>
+                    <td>{{ room.description }}</td>
+                    <td>${{ room.price }}</td>
+                    <td>{{ room.createdAt ? room.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                    <td>{{ room.type }}</td>
+                    <td><img src="{{ asset('img/image-rooms/' ~ room.img) }}" alt="{{ room.name }}" class="img-thumbnail" style="max-height: 100px;"></td>
+                    <td>
+                        <a href="{{ path('app_rooms_show', {'id': room.id}) }}" class="btn btn-sm btn-primary">Show</a>
+                        <a href="{{ path('app_rooms_edit', {'id': room.id}) }}" class="btn btn-sm btn-warning">Edit</a>
+                        <form method="post" action="{{ path('app_rooms_delete', {'id': room.id}) }}" onsubmit="return confirm('Are you sure you want to delete this item?');" class="d-inline">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ room.id) }}">
+                            <button type="submit" class="btn btn-sm btn-danger">
+                                <i class="fas fa-trash-alt"></i> Delete
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="8">No records found</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <a href="{{ path('app_rooms_new') }}" class="btn btn-success mb-5">Create new</a>
+</div>
+{% endblock %}
