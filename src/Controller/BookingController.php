@@ -28,45 +28,56 @@ class BookingController extends AbstractController
     }
 
     #[Route('/booking/new/{roomId}', name: 'app_booking_new')]
-    public function new(Request $request, int $roomId): Response
+    public function new(Request $request, int $roomId, BookingRepository $bookingRepository): Response
     {
         $booking = new Booking();
         $form = $this->createForm(BookingType::class, $booking);
         $form->handleRequest($request);
-
+    
+        // Fetch available rooms based on selected date range
+        $startDate = $form->get('startdate')->getData();
+        $endDate = $form->get('enddate')->getData();
+        
         if ($form->isSubmitted() && $form->isValid()) {
             // Get the logged-in user
             $user = $this->getUser();
-
-            // Check if the user is not null before accessing its properties
-            if ($user !== null) {
-                // Set the logged-in user's name as the customer name
-                $customerName = $user->getUserIdentifier();
-                $booking->setCustomername($customerName);
-            } else {
-                // If user is not authenticated, handle the situation accordingly (e.g., redirect to login)
-                 return $this->redirectToRoute('app_login');
+    
+            if ($user === null) {
+                return $this->redirectToRoute('app_login');
             }
-            // Set the created_at timestamp to the current time in the local timezone
+    
+            $customerName = $user->getUserIdentifier();
+            $booking->setCustomername($customerName);
+    
             $now = new DateTime('now', new DateTimeZone(date_default_timezone_get()));
             $booking->setCreatedat($now);
-
-            // Set the room
+    
             $room = $this->entityManager->getRepository(Rooms::class)->find($roomId);
             $booking->setRooms($room);
-
-            // Handle saving the booking to the database
+    
+            $address = $booking->getAddress();
+            $this->entityManager->persist($address);
             $this->entityManager->persist($booking);
             $this->entityManager->flush();
-
-            // Redirect to a success page or any other desired page
+    
             return $this->redirectToRoute('app_booking_success');
         }
-
+        
+        // Check if start and end dates are not null before fetching available rooms
+        if ($startDate !== null && $endDate !== null) {
+            // Retrieve available rooms by date range from the repository
+            $availableRooms = $bookingRepository->findAvailableRoomsByDateRange($startDate, $endDate);
+        } else {
+            $availableRooms = [];
+        }
+    
         return $this->render('booking/new.html.twig', [
             'form' => $form->createView(),
+            'availableRooms' => $availableRooms,
         ]);
     }
+    
+
 
     #[Route('/booking/success', name: 'app_booking_success')]
     public function success(): Response

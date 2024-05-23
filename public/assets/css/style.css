@@ -55,3 +55,39 @@ body {
     color: #dee2e6;
   }
   
+
+  /* image Room Index Home Style */
+
+  .room-card {
+    position: relative;
+    margin-bottom: 20px;
+  }
+
+  .room-img {
+    height: 250px; /* Increased height for better image display */
+    width: 100%; /* Set width to 100% for responsive layout */
+    object-fit: cover;
+  }
+
+  .card-img-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 128, 0, 0.7); /* Green background with transparency */
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 20px; /* Add padding for content spacing */
+  }
+
+  .card-title a {
+    color: white;
+    text-decoration: none;
+  }
+
+  .card-title a:hover {
+    text-decoration: underline;
+  }
