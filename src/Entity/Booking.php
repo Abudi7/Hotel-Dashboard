@@ -28,6 +28,12 @@ class Booking
     #[ORM\ManyToOne(inversedBy: 'bookings')]
     private ?Rooms $Rooms = null;
 
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $createdat = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $updatedat = null;
+
 
 
     public function __construct()
@@ -84,6 +90,30 @@ class Booking
     public function setRooms(?Rooms $Rooms): static
     {
         $this->Rooms = $Rooms;
+
+        return $this;
+    }
+
+    public function getCreatedat(): ?\DateTimeInterface
+    {
+        return $this->createdat;
+    }
+
+    public function setCreatedat(\DateTimeInterface $createdat): static
+    {
+        $this->createdat = $createdat;
+
+        return $this;
+    }
+
+    public function getUpdatedat(): ?\DateTimeInterface
+    {
+        return $this->updatedat;
+    }
+
+    public function setUpdatedat(?\DateTimeInterface $updatedat): static
+    {
+        $this->updatedat = $updatedat;
 
         return $this;
     }

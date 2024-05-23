@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Rooms;
-use App\Form\Rooms1Type;
+use App\Form\RoomsType;
 use App\Repository\RoomsRepository;
 use DateTime;
 use DateTimeZone;
@@ -31,7 +31,7 @@ class RoomsController extends AbstractController
     public function new(Request $request, SluggerInterface $slugger, EntityManagerInterface $entityManager): Response
     {
         $room = new Rooms();
-        $form = $this->createForm(Rooms1Type::class, $room);
+        $form = $this->createForm(RoomsType::class, $room);
         $form->handleRequest($request);
         
         /** @var UploadedFile $imageFile */
@@ -78,7 +78,7 @@ class RoomsController extends AbstractController
     #[Route('rooms/{id}/edit', name: 'app_rooms_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Rooms $room, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
     {
-        $form = $this->createForm(Rooms1Type::class, $room);
+        $form = $this->createForm(RoomsType::class, $room);
         $form->handleRequest($request);
     
         if ($form->isSubmitted() && $form->isValid()) {
