@@ -6,13 +6,33 @@ use App\Entity\Booking;
 use App\Entity\Rooms;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextType; // Import TextType
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Security\Core\Security; // Import Security
 
 class BookingType extends AbstractType
 {
+    private $security;
+
+    public function __construct(Security $security)
+    {
+        $this->security = $security;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $user = $this->security->getUser(); // Get the logged-in user
+        
+        $customerNameOptions = [
+            'disabled' => true, // Make the field disabled so it cannot be edited
+        ];
+
+        if ($user !== null) {
+            $customerNameOptions['data'] = $user->getUserIdentifier(); // Set the default value to the identifier of the logged-in user
+        }
+
         $builder
             ->add('startdate', null, [
                 'widget' => 'single_text',
@@ -20,11 +40,12 @@ class BookingType extends AbstractType
             ->add('enddate', null, [
                 'widget' => 'single_text',
             ])
-            ->add('customername')
+            ->add('customername', TextType::class, $customerNameOptions)
             ->add('Rooms', EntityType::class, [
                 'class' => Rooms::class,
                 'choice_label' => 'id',
             ])
+            ->add('submit', SubmitType::class)
         ;
     }
 

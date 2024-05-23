@@ -22,6 +22,7 @@ class RoomsController extends AbstractController
     #[Route('/rooms', name: 'app_rooms_index', methods: ['GET'])]
     public function index(RoomsRepository $roomsRepository): Response
     {
+        #$this->denyAccessUnlessGranted('ROLE_ADMIN');
         return $this->render('rooms/index.html.twig', [
             'rooms' => $roomsRepository->findAll(),
         ]);
@@ -30,6 +31,7 @@ class RoomsController extends AbstractController
     #[Route('rooms/new', name: 'app_rooms_new', methods: ['GET', 'POST'])]
     public function new(Request $request, SluggerInterface $slugger, EntityManagerInterface $entityManager): Response
     {
+        #$this->denyAccessUnlessGranted('ROLE_ADMIN');
         $room = new Rooms();
         $form = $this->createForm(RoomsType::class, $room);
         $form->handleRequest($request);
@@ -70,6 +72,7 @@ class RoomsController extends AbstractController
     #[Route('rooms/{id}', name: 'app_rooms_show', methods: ['GET'])]
     public function show(Rooms $room): Response
     {
+        #$this->denyAccessUnlessGranted('ROLE_ADMIN');
         return $this->render('rooms/show.html.twig', [
             'room' => $room,
         ]);

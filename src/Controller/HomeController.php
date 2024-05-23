@@ -38,16 +38,16 @@ class HomeController extends AbstractController
             // Query the database to find rooms that are available within the selected date range
             $availableRooms = $entityManager->getRepository(Rooms::class)->createQueryBuilder('r')
                 ->leftJoin('r.bookings', 'b')
-                ->where('b.id IS NULL OR b.startdate > :enddate OR b.enddate < :startdate')
-                ->setParameter('startdate', $startDate)
-                ->setParameter('enddate', $endDate)
+                ->where('b.id IS NULL OR :endDate < b.startdate OR :startDate > b.enddate')
+                ->setParameter('startDate', $startDate)
+                ->setParameter('endDate', $endDate)
                 ->getQuery()
                 ->getResult();
         } else {
             // If the form is not submitted or not valid, show rooms available for the current date
             $availableRooms = $entityManager->getRepository(Rooms::class)->createQueryBuilder('r')
                 ->leftJoin('r.bookings', 'b')
-                ->where('b.id IS NULL OR b.startdate > :currentDate OR b.enddate < :currentDate')
+                ->where('b.id IS NULL OR :currentDate < b.startdate OR :currentDate > b.enddate')
                 ->setParameter('currentDate', $currentDate)
                 ->getQuery()
                 ->getResult();
