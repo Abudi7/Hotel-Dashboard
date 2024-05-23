@@ -1,4 +1,3 @@
-{# templates/booking/index.html.twig #}
 {% extends 'base.html.twig' %}
 
 {% block title %}My Bookings{% endblock %}
@@ -19,6 +18,15 @@
                     {% set days = booking.enddate.diff(booking.startdate).days %}
                     <p class="card-text">Price: ${{ booking.rooms.price }} per night</p>
                     <p class="card-text">Total Price: ${{ booking.rooms.price * days }}</p>
+                    {% if is_granted('ROLE_ADMIN') %}
+                    <div class="btn-group" role="group" aria-label="Booking Actions">
+                        <a href="{{ path('app_booking_edit', {'id': booking.id}) }}" class="btn btn-primary">Edit</a>
+                        <form action="{{ path('app_booking_delete', {'id': booking.id}) }}" method="post" style="display: inline-block;">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ booking.id) }}">
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>

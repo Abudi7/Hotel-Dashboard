@@ -6,6 +6,7 @@ use App\Entity\Booking;
 use App\Entity\Rooms;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType; // Import TextType
 use Symfony\Component\Form\FormBuilderInterface;
@@ -34,19 +35,22 @@ class BookingType extends AbstractType
         }
 
         $builder
-            ->add('startdate', null, [
+            ->add('customername', TextType::class, [
+                'label' => 'Customer Name',
+            ])
+            ->add('startdate', DateType::class, [
                 'widget' => 'single_text',
+                'label' => 'Start Date',
             ])
-            ->add('enddate', null, [
+            ->add('enddate', DateType::class, [
                 'widget' => 'single_text',
+                'label' => 'End Date',
             ])
-            ->add('customername', TextType::class, $customerNameOptions)
-            ->add('Rooms', EntityType::class, [
-                'class' => Rooms::class,
-                'choice_label' => 'id',
-            ])
-            ->add('submit', SubmitType::class)
-        ;
+            ->add('rooms', EntityType::class, [
+                'class' => 'App\Entity\Rooms',
+                'choice_label' => 'name', // Adjust this according to your Room entity
+                'label' => 'Room',
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

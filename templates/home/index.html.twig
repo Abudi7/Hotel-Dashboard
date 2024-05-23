@@ -1,81 +1,45 @@
-{# templates/home/index.html.twig #}
 {% extends 'base.html.twig' %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .room-card {
-            margin-bottom: 20px;
-        }
-        .room-img {
-            height: 200px;
-            object-fit: cover;
-        }
-        .form-inline {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 20px;
-        }
-        .form-inline .form-group {
-            margin-right: 10px;
-        }
-        @media (max-width: 768px) {
-            .form-inline {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .form-inline .form-group {
-                margin-right: 0;
-                margin-bottom: 10px;
-            }
-        }
-    </style>
-{% endblock %}
-
-{% block javascripts %}
-    {{ parent() }}
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const startDateInput = document.querySelector('#{{ form.startdate.vars.id }}');
-            const endDateInput = document.querySelector('#{{ form.enddate.vars.id }}');
-
-            startDateInput.addEventListener('change', function () {
-                endDateInput.min = this.value;
-            });
-        });
-    </script>
-{% endblock %}
+{% block title %}Welcome to Our Hotel{% endblock %}
 
 {% block body %}
 <div class="container mt-5">
-    <div class="d-flex justify-content-between">
-        <h1>{{ controller_name }}</h1>
-        <div>
-            {{ form_start(form, {'attr': {'class': 'form-inline'}}) }}
-                <div class="form-group">
-                    {{ form_row(form.startdate, {'attr': {'class': 'form-control'}}) }}
-                </div>
-                <div class="form-group">
-                    {{ form_row(form.enddate, {'attr': {'class': 'form-control'}}) }}
-                </div>
-                <div class="form-group">
-                    {{ form_row(form.submit, {'attr': {'class': 'btn btn-primary'}}) }}
-                </div>
-            {{ form_end(form) }}
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="text-center mb-4">
+                <h1>Welcome to Our Hotel</h1>
+                <p class="lead">Indulge in comfort, tranquility, and luxury at our hotel. Experience hospitality like never before.</p>
+                <p class="lead">Book your stay now!</p>
+            </div>
+            <div class="d-flex justify-content-center mb-4">
+                {{ form_start(form, {'attr': {'class': 'form-inline'}}) }}
+                    <div class="form-group mr-2">
+                        {{ form_row(form.startdate, {'attr': {'class': 'form-control', 'placeholder': 'Check-in Date', 'autocomplete': 'off'}}) }}
+                    </div>
+                    <div class="form-group mr-2">
+                        {{ form_row(form.enddate, {'attr': {'class': 'form-control', 'placeholder': 'Check-out Date', 'autocomplete': 'off'}}) }}
+                    </div>
+                    <div class="form-group mt-2">
+                        {{ form_row(form.submit, {'attr': {'class': 'btn btn-primary'}}) }}
+                    </div>
+                {{ form_end(form) }}
+            </div>
+            <p class="text-center">Escape to serenity and make memories that last a lifetime.</p>
         </div>
     </div>
+</div>
 
-    {% if availableRooms is defined %}
-        <h2 class="mt-5">Available Rooms</h2>
+{% if availableRooms is defined %}
+    <div class="container mt-5">
+        <h2 class="text-center mb-4">Available Rooms</h2>
         <div class="row">
             {% for room in availableRooms %}
-                <div class="col-md-4">
+                <div class="col-lg-4 col-md-6 mb-4">
                     <div class="card room-card">
                         <img src="{{ asset('img/image-rooms/' ~ room.img) }}" class="card-img-top room-img" alt="{{ room.name }}">
                         <div class="card-body">
                             <h5 class="card-title">
-                                <a href="{{ path('app_rooms_show', {'id': room.id}) }}">{{ room.name }}</a>
+                                <a href="{{ path('app_rooms_show', {'id': room.id}) }}" class="text-decoration-none text-dark">{{ room.name }}</a>
                             </h5>
                             <p class="card-text"><strong>Price:</strong> ${{ room.price }}</p>
                             <p class="card-text"><strong>Type:</strong> {{ room.type }}</p>
@@ -84,10 +48,10 @@
                 </div>
             {% else %}
                 <div class="col-12">
-                    <p class="text-danger">No rooms available for the selected dates.</p>
+                    <p class="text-center text-danger">No rooms available for the selected dates.</p>
                 </div>
             {% endfor %}
         </div>
-    {% endif %}
-</div>
+    </div>
+{% endif %}
 {% endblock %}

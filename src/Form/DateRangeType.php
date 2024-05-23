@@ -19,6 +19,9 @@ class DateRangeType extends AbstractType
                 'label' => 'Start Date',
                 'attr' => [
                     'min' => $today,
+                    'class' => 'form-control', // Bootstrap form-control class
+                    'placeholder' => 'Select start date', // Placeholder text
+                    'autocomplete' => 'off', // Disable autocomplete
                 ],
             ])
             ->add('enddate', DateType::class, [
@@ -26,10 +29,16 @@ class DateRangeType extends AbstractType
                 'label' => 'End Date',
                 'attr' => [
                     'min' => $today,
+                    'class' => 'form-control', // Bootstrap form-control class
+                    'placeholder' => 'Select end date', // Placeholder text
+                    'autocomplete' => 'off', // Disable autocomplete
                 ],
             ])
             ->add('submit', SubmitType::class, [
                 'label' => 'Check Availability',
+                'attr' => [
+                    'class' => 'btn btn-primary', // Bootstrap primary button class
+                ],
             ]);
     }
 }
