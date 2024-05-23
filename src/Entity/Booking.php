@@ -34,6 +34,9 @@ class Booking
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $updatedat = null;
 
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    private ?Address $Address = null;
+
 
 
     public function __construct()
@@ -114,6 +117,18 @@ class Booking
     public function setUpdatedat(?\DateTimeInterface $updatedat): static
     {
         $this->updatedat = $updatedat;
+
+        return $this;
+    }
+
+    public function getAddress(): ?Address
+    {
+        return $this->Address;
+    }
+
+    public function setAddress(?Address $Address): static
+    {
+        $this->Address = $Address;
 
         return $this;
     }
