@@ -8,6 +8,7 @@ use App\Form\BookingType;
 use App\Repository\BookingRepository;
 use DateTime;
 use DateTimeZone;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -83,6 +84,35 @@ class BookingController extends AbstractController
         return $this->render('booking/index.html.twig', [
             'bookings' => $bookings,
         ]);
+    }
+
+    #[Route('/booking/edit/{id}', name: 'app_booking_edit')]
+    public function edit(Request $request, Booking $booking): Response
+    {
+        $form = $this->createForm(BookingType::class, $booking);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->entityManager->flush();
+
+            return $this->redirectToRoute('app_booking');
+        }
+
+        return $this->render('booking/edit.html.twig', [
+            'booking' => $booking,
+            'form' => $form->createView(),
+        ]);
+    }
+
+    #[Route('/booking/delete/{id}', name: 'app_booking_delete')]
+    public function delete(Request $request, Booking $booking): Response
+    {
+        if ($this->isCsrfTokenValid('delete'.$booking->getId(), $request->request->get('_token'))) {
+            $this->entityManager->remove($booking);
+            $this->entityManager->flush();
+        }
+
+        return $this->redirectToRoute('app_booking');
     }
 }
 
