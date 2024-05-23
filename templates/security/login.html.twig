@@ -19,6 +19,10 @@
                                 <div class="mb-3">
                                     You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
                                 </div>
+                            {% else %}
+                                <div class="mb-3">
+                                    Don't have an account? <a href="{{ path('app_register') }}">Register</a>
+                                </div>
                             {% endif %}
 
                             <div class="mb-3">
@@ -41,3 +45,4 @@
         </div>
     </div>
 {% endblock %}
+

@@ -3,6 +3,8 @@
 namespace App\Controller;
 use App\Entity\User;
 use App\Form\UserProfileFormType;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -13,7 +15,9 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-
+use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
+use Symfony\Component\Security\Http\Authenticator\FormLoginAuthenticator;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 class SecurityController extends AbstractController
 {
@@ -38,57 +42,69 @@ class SecurityController extends AbstractController
         throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
     }
 
-    
-    #[Route('/profile/{id}', name: 'app_profile')]
-    public function editProfile(Request $request, ManagerRegistry $managerRegistry, int $id, UserPasswordHasherInterface $passwordEncoder): Response
+    #[Route('/profile/{id}', name: 'app_profile', methods: ['GET', 'POST'])]
+    public function editProfile(
+        Request $request, 
+        User $user, 
+        EntityManagerInterface $entityManager, 
+        UserPasswordHasherInterface $passwordEncoder, 
+        SluggerInterface $slugger,
+        UserAuthenticatorInterface $userAuthenticator,
+        FormLoginAuthenticator $authenticator
+    ): Response
     {
-        $user = $this->getUser(); // Get the logged-in user
-
-        if (!$user instanceof User) {
-          throw $this->createNotFoundException('User not found.');
+        $form = $this->createForm(UserProfileFormType::class, $user);
+        $form->handleRequest($request);
+    
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Handle password updating
+            $plainPassword = $form->get('plainPassword')->getData();
+            if ($plainPassword) {
+                $encodedPassword = $passwordEncoder->hashPassword($user, $plainPassword);
+                $user->setPassword($encodedPassword);
+            }
+    
+            // Handle image upload
+            $imageFile = $form->get('img')->getData();
+            if ($imageFile) {
+                $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+    
+                try {
+                    $imageFile->move($this->getParameter('profile'), $newFilename);
+                } catch (FileException $e) {
+                    // Handle the exception gracefully
+                    throw new \Exception('Failed to upload the file: ' . $e->getMessage());
+                }
+    
+               
+    
+                // Update the user's image property
+                $user->setImg($newFilename);
+            }
+    
+            $user->setUpdatedAt(new \DateTime('now', new \DateTimeZone(date_default_timezone_get())));
+    
+            $entityManager->flush();
+    
+            // Re-authenticate the user with the new password
+            $userAuthenticator->authenticateUser(
+                $user,
+                $authenticator,
+                $request
+            );
+    
+            // Redirect to the display profile page while staying logged in
+            return $this->redirectToRoute('app_my_profile', ['id' => $user->getId()]);
         }
-    $form = $this->createForm(UserProfileFormType::class, $user);
-    $form->handleRequest($request);
-
-    if ($form->isSubmitted() && $form->isValid()) {
-        // Handle password updating
-        $plainPassword = $form->get('plainPassword')->getData();
-        if ($plainPassword) {
-        $encodedPassword = $passwordEncoder->hashPassword($user, $plainPassword);
-        $user->setPassword($encodedPassword);
-        }
-
-        // Handle image upload
-        /** @var UploadedFile|null $img */
-        $img = $form->get('img')->getData();
-        if ($img) {
-        $originalFilename = pathinfo($img->getClientOriginalName(), PATHINFO_FILENAME);
-        $safeFilename = preg_replace('/[^a-zA-Z0-9-_.]/', '', $originalFilename);
-        $newFilename = $safeFilename . '-' . uniqid() . '.' . $img->guessExtension();
-
-        try {
-            $img->move($this->getParameter('kernel.project_dir') . '/public/img', $newFilename);
-            $user->setImg($newFilename);
-        } catch (FileException $e) {
-            $this->addFlash('error', 'An error occurred while uploading the image.');
-            return $this->redirectToRoute('app_profile', ['id' => $user->getId()]);
-        }
-        }
-
-        $user->setUpdatedAt(new \DateTime('now', new \DateTimeZone(date_default_timezone_get())));
-
-        $entityManager = $managerRegistry->getManager();
-        $entityManager->flush();
-
-        // Redirect to the display profile page while staying logged in
-        return $this->redirectToRoute('app_my_profile', ['id' => $user->getId()]);
+    
+        return $this->render('security/edit_profile.html.twig', [
+            'form' => $form->createView(),
+            'user' => $user
+        ]);
     }
-
-    return $this->render('security/edit_profile.html.twig', [
-        'form' => $form->createView(),
-        'user' => $user
-    ]);
-    }
+    
 
     
 

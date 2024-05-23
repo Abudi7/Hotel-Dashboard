@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\RoomsRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -31,6 +33,19 @@ class Rooms
 
     #[ORM\Column(length: 400)]
     private ?string $img = null;
+
+    /**
+     * @var Collection<int, Booking>
+     */
+    #[ORM\OneToMany(targetEntity: Booking::class, mappedBy: 'Rooms')]
+    private Collection $bookings;
+
+    public function __construct()
+    {
+        $this->bookings = new ArrayCollection();
+    }
+
+ 
 
     public function getId(): ?int
     {
@@ -108,4 +123,35 @@ class Rooms
 
         return $this;
     }
+
+    /**
+     * @return Collection<int, Booking>
+     */
+    public function getBookings(): Collection
+    {
+        return $this->bookings;
+    }
+
+    public function addBooking(Booking $booking): static
+    {
+        if (!$this->bookings->contains($booking)) {
+            $this->bookings->add($booking);
+            $booking->setRooms($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBooking(Booking $booking): static
+    {
+        if ($this->bookings->removeElement($booking)) {
+            // set the owning side to null (unless already changed)
+            if ($booking->getRooms() === $this) {
+                $booking->setRooms(null);
+            }
+        }
+
+        return $this;
+    }
+
 }
